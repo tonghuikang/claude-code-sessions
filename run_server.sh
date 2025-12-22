@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # Default port
-DEFAULT_PORT=44043
+DEFAULT_PORT=44045
 MAX_RETRIES=3
 
 start_server() {

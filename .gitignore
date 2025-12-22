@@ -5,6 +5,7 @@
 .ruff_cache/
 *.pyc
 data/*
+!data/index.json
 !data/projects/
 data/projects/*
 !data/projects/-Users-htong-Desktop-claude-code-tracing/

@@ -1,0 +1,225 @@
+{
+  "projects": [
+    {
+      "name": "-Users-htong-Desktop-claude-code-tracing",
+      "path": "data/projects/-Users-htong-Desktop-claude-code-tracing",
+      "sessionCount": 29,
+      "sessions": [
+        {
+          "name": "85bdcfae-69e1-4c7e-a762-8970466ebb0c.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/85bdcfae-69e1-4c7e-a762-8970466ebb0c.jsonl",
+          "summary": "",
+          "modified": 1766306892.0
+        },
+        {
+          "name": "agent-95fd86b8.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-95fd86b8.jsonl",
+          "summary": "",
+          "modified": 1766306279.0,
+          "agentId": "95fd86b8",
+          "parentSessionId": "85bdcfae-69e1-4c7e-a762-8970466ebb0c"
+        },
+        {
+          "name": "agent-edc157a9.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-edc157a9.jsonl",
+          "summary": "",
+          "modified": 1766306123.0,
+          "agentId": "edc157a9",
+          "parentSessionId": "85bdcfae-69e1-4c7e-a762-8970466ebb0c"
+        },
+        {
+          "name": "bde6418c-ae88-4e72-a8c4-4323aa337806.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/bde6418c-ae88-4e72-a8c4-4323aa337806.jsonl",
+          "summary": "Trace Storage: Agent Sessions Nested Under Parents",
+          "modified": 1766306083.0
+        },
+        {
+          "name": "agent-c29a4b75.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-c29a4b75.jsonl",
+          "summary": "",
+          "modified": 1766302481.0,
+          "agentId": "c29a4b75",
+          "parentSessionId": "68027199-53d3-432d-9b96-1fb252f87dc4"
+        },
+        {
+          "name": "agent-9668a4ba.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-9668a4ba.jsonl",
+          "summary": "",
+          "modified": 1766302253.0,
+          "agentId": "9668a4ba",
+          "parentSessionId": "68027199-53d3-432d-9b96-1fb252f87dc4"
+        },
+        {
+          "name": "68027199-53d3-432d-9b96-1fb252f87dc4.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/68027199-53d3-432d-9b96-1fb252f87dc4.jsonl",
+          "summary": "",
+          "modified": 1766302250.0
+        },
+        {
+          "name": "agent-909729d1.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-909729d1.jsonl",
+          "summary": "",
+          "modified": 1766287784.0,
+          "agentId": "909729d1",
+          "parentSessionId": "bde6418c-ae88-4e72-a8c4-4323aa337806"
+        },
+        {
+          "name": "agent-f4785861.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-f4785861.jsonl",
+          "summary": "",
+          "modified": 1766287770.0,
+          "agentId": "f4785861",
+          "parentSessionId": "bde6418c-ae88-4e72-a8c4-4323aa337806"
+        },
+        {
+          "name": "860b45a6-fc81-4387-a675-085104ac280d.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/860b45a6-fc81-4387-a675-085104ac280d.jsonl",
+          "summary": "",
+          "modified": 1766283871.0
+        },
+        {
+          "name": "668bd5a3-8092-41af-9efb-4db12c1493b1.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/668bd5a3-8092-41af-9efb-4db12c1493b1.jsonl",
+          "summary": "Nested agent traces under parent sessions",
+          "modified": 1766283595.0
+        },
+        {
+          "name": "agent-8c1a09a5.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-8c1a09a5.jsonl",
+          "summary": "",
+          "modified": 1766283230.0,
+          "agentId": "8c1a09a5",
+          "parentSessionId": "668bd5a3-8092-41af-9efb-4db12c1493b1"
+        },
+        {
+          "name": "agent-d562b487.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-d562b487.jsonl",
+          "summary": "",
+          "modified": 1766283227.0,
+          "agentId": "d562b487",
+          "parentSessionId": "668bd5a3-8092-41af-9efb-4db12c1493b1"
+        },
+        {
+          "name": "agent-1be6de53.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-1be6de53.jsonl",
+          "summary": "",
+          "modified": 1766280382.0,
+          "agentId": "1be6de53",
+          "parentSessionId": "860b45a6-fc81-4387-a675-085104ac280d"
+        },
+        {
+          "name": "agent-996b3603.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-996b3603.jsonl",
+          "summary": "",
+          "modified": 1766280371.0,
+          "agentId": "996b3603",
+          "parentSessionId": "860b45a6-fc81-4387-a675-085104ac280d"
+        },
+        {
+          "name": "1b0e21a5-da68-4505-96cb-06509b62eff2.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/1b0e21a5-da68-4505-96cb-06509b62eff2.jsonl",
+          "summary": "Rename visualizer, create bulletproof server script, display hook errors",
+          "modified": 1766280256.0
+        },
+        {
+          "name": "agent-6f965f9f.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-6f965f9f.jsonl",
+          "summary": "",
+          "modified": 1766278815.0,
+          "agentId": "6f965f9f",
+          "parentSessionId": "1b0e21a5-da68-4505-96cb-06509b62eff2"
+        },
+        {
+          "name": "agent-3c718c8f.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-3c718c8f.jsonl",
+          "summary": "",
+          "modified": 1766278814.0,
+          "agentId": "3c718c8f",
+          "parentSessionId": "1b0e21a5-da68-4505-96cb-06509b62eff2"
+        },
+        {
+          "name": "b618abe9-f013-4bc4-aa94-4e2bdbe01fdd.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/b618abe9-f013-4bc4-aa94-4e2bdbe01fdd.jsonl",
+          "summary": "",
+          "modified": 1766278276.0
+        },
+        {
+          "name": "agent-9b39813a.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-9b39813a.jsonl",
+          "summary": "",
+          "modified": 1766276975.0,
+          "agentId": "9b39813a",
+          "parentSessionId": "b618abe9-f013-4bc4-aa94-4e2bdbe01fdd"
+        },
+        {
+          "name": "agent-1d70c8a1.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-1d70c8a1.jsonl",
+          "summary": "",
+          "modified": 1766276960.0,
+          "agentId": "1d70c8a1",
+          "parentSessionId": "b618abe9-f013-4bc4-aa94-4e2bdbe01fdd"
+        },
+        {
+          "name": "10d53ddc-6406-4bed-a32b-da56257311f1.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/10d53ddc-6406-4bed-a32b-da56257311f1.jsonl",
+          "summary": "Claude Code trace storage location and format",
+          "modified": 1766276928.0
+        },
+        {
+          "name": "agent-00b06e66.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-00b06e66.jsonl",
+          "summary": "",
+          "modified": 1766267986.0,
+          "agentId": "00b06e66",
+          "parentSessionId": "10d53ddc-6406-4bed-a32b-da56257311f1"
+        },
+        {
+          "name": "agent-05f27cb5.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-05f27cb5.jsonl",
+          "summary": "",
+          "modified": 1766267959.0,
+          "agentId": "05f27cb5",
+          "parentSessionId": "10d53ddc-6406-4bed-a32b-da56257311f1"
+        },
+        {
+          "name": "agent-26e26d75.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-26e26d75.jsonl",
+          "summary": "",
+          "modified": 1766267950.0,
+          "agentId": "26e26d75",
+          "parentSessionId": "10d53ddc-6406-4bed-a32b-da56257311f1"
+        },
+        {
+          "name": "66679f29-e6ba-48dd-a396-ad414fe99be7.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/66679f29-e6ba-48dd-a396-ad414fe99be7.jsonl",
+          "summary": "",
+          "modified": 1766258484.0
+        },
+        {
+          "name": "agent-6cf11270.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-6cf11270.jsonl",
+          "summary": "",
+          "modified": 1766258473.0,
+          "agentId": "6cf11270",
+          "parentSessionId": "66679f29-e6ba-48dd-a396-ad414fe99be7"
+        },
+        {
+          "name": "agent-ee9821bc.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-ee9821bc.jsonl",
+          "summary": "",
+          "modified": 1766258423.0,
+          "agentId": "ee9821bc",
+          "parentSessionId": "66679f29-e6ba-48dd-a396-ad414fe99be7"
+        },
+        {
+          "name": "agent-30dce44f.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-tracing/agent-30dce44f.jsonl",
+          "summary": "",
+          "modified": 1766258415.0,
+          "agentId": "30dce44f",
+          "parentSessionId": "66679f29-e6ba-48dd-a396-ad414fe99be7"
+        }
+      ]
+    }
+  ]
+}
