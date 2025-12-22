@@ -22,5 +22,14 @@ Formatting
 - Sort imports: uv run --frozen ruff check --select I *.py --fix
 - Type checking: uv run --frozen mypy *.py
 
+Cleanup
+- You may be asked for a data privacy review. Follow these processes
+    - Delete gitignored files (except .venv): `git clean -fdX -e .venv`
+        - Run the full run, not the dry run
+    - Search among existing files for private information
+        - Example of private information
+            - API keys
+            - Contact information
+
 Approved Commands
 - ./run_server.sh
