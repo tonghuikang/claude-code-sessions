@@ -9,3 +9,4 @@ data/*
 !data/projects/
 data/projects/*
 !data/projects/-Users-htong-Desktop-claude-code-tracing/
+!data/projects/-Users-htong-Desktop-claude-code-sessions/

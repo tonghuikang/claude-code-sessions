@@ -24,8 +24,7 @@ Formatting
 
 Cleanup
 - You may be asked for a data privacy review. Follow these processes
-    - Delete gitignored files (except .venv): `git clean -fdX -e .venv`
-        - Run the full run, not the dry run
+    - Run `./cleanup.sh` to delete gitignored files (except .venv) and rebuild the index
     - Search among existing files for private information
         - Example of private information
             - API keys
@@ -33,3 +32,4 @@ Cleanup
 
 Approved Commands
 - ./run_server.sh
+- ./cleanup.sh

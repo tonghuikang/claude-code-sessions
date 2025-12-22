@@ -7,18 +7,49 @@ from pathlib import Path
 
 
 def get_conversation_metadata(file_path: Path) -> dict:
-    """Extract metadata from first line of JSONL file."""
-    result = {"summary": "", "parentSessionId": None, "agentId": None}
+    """Extract metadata from JSONL file."""
+    result = {
+        "summary": "",
+        "parentSessionId": None,
+        "agentId": None,
+        "firstUserMessage": "",
+    }
     try:
         with open(file_path) as f:
-            first_line = f.readline()
-            data = json.loads(first_line)
-            if data.get("type") == "summary":
-                result["summary"] = data.get("summary", "")
-            # For agent sessions, extract parent session and agent ID
-            if data.get("agentId"):
-                result["agentId"] = data.get("agentId")
-                result["parentSessionId"] = data.get("sessionId")
+            for line in f:
+                data = json.loads(line)
+                if data.get("type") == "summary":
+                    result["summary"] = data.get("summary", "")
+                # For agent sessions, extract parent session and agent ID
+                if data.get("agentId") and not result["agentId"]:
+                    result["agentId"] = data.get("agentId")
+                    result["parentSessionId"] = data.get("sessionId")
+                # Extract first real user message (not tool results, not meta/system messages)
+                if (
+                    data.get("type") == "user"
+                    and not result["firstUserMessage"]
+                    and data.get("message")
+                    and not data.get(
+                        "isMeta"
+                    )  # Skip meta messages (hook feedback, etc)
+                ):
+                    content = data["message"].get("content", "")
+                    # Skip tool results (array with tool_result items)
+                    if isinstance(content, list):
+                        continue
+                    # Skip internal warmup messages
+                    if content == "Warmup":
+                        continue
+                    # Skip continuation messages from context overflow
+                    if isinstance(content, str) and content.startswith(
+                        "This session is being continued from a previous conversation"
+                    ):
+                        continue
+                    if isinstance(content, str) and content.strip():
+                        result["firstUserMessage"] = content[:100]
+                # Stop once we have what we need
+                if result["summary"] and result["firstUserMessage"]:
+                    break
     except (json.JSONDecodeError, FileNotFoundError, KeyError):
         pass
     return result
@@ -51,6 +82,7 @@ def build_index(data_dir: Path) -> dict:
                     "name": jsonl_file.name,
                     "path": str(jsonl_file.relative_to(data_dir.parent.parent)),
                     "summary": metadata["summary"],
+                    "firstUserMessage": metadata["firstUserMessage"],
                     "modified": os.path.getmtime(jsonl_file),
                 }
                 # Add agent-specific fields if present

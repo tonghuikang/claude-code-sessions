@@ -258,6 +258,60 @@
             color: #6e7681;
         }
 
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-toggle:hover {
+            background: #30363d;
+            border-color: #484f58;
+        }
+
+        .filter-toggle.active {
+            background: #1f6feb;
+            border-color: #1f6feb;
+            color: #fff;
+        }
+
+        /* User-only filter mode */
+        .messages-container.user-only .message:not(.user) {
+            display: none;
+        }
+
+        .messages-container.user-only .message.user {
+            display: block;
+            cursor: pointer;
+        }
+
+        .messages-container.user-only .message.user:hover {
+            background: #1c2128;
+        }
+
+        /* When a user message is expanded, show following non-user messages */
+        .messages-container.user-only .message.user.expanded {
+            background: #1f6feb22;
+        }
+
+        .messages-container.user-only .message.expanded-child {
+            display: block;
+        }
+
         .messages-container {
             flex: 1;
             overflow-y: auto;
@@ -659,10 +713,17 @@
 
         <div class="main-content">
             <div class="conversation-header" id="conversationHeader">
-                <button class="hamburger" onclick="toggleSidebar()">☰</button>
-                <div>
-                    <h2 id="conversationTitle">Select a conversation</h2>
-                    <div class="meta" id="conversationMeta"></div>
+                <div style="display: flex; align-items: center;">
+                    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+                    <div>
+                        <h2 id="conversationTitle">Select a conversation</h2>
+                        <div class="meta" id="conversationMeta"></div>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <button class="filter-toggle" id="userOnlyToggle" onclick="toggleUserOnly()">
+                        User messages only
+                    </button>
                 </div>
             </div>
 
@@ -684,6 +745,55 @@
         function closeSidebar() {
             document.getElementById('sidebar').classList.remove('open');
             document.getElementById('sidebarOverlay').classList.remove('open');
+        }
+
+        // Toggle user-only message filter
+        let userOnlyMode = false;
+
+        function toggleUserOnly() {
+            userOnlyMode = !userOnlyMode;
+            const toggle = document.getElementById('userOnlyToggle');
+            const container = document.getElementById('messagesContainer');
+
+            if (userOnlyMode) {
+                toggle.classList.add('active');
+                container.classList.add('user-only');
+                // Collapse all expansions when entering user-only mode
+                collapseAllUserMessages();
+            } else {
+                toggle.classList.remove('active');
+                container.classList.remove('user-only');
+                // Clean up expanded classes
+                collapseAllUserMessages();
+            }
+        }
+
+        function collapseAllUserMessages() {
+            document.querySelectorAll('.message.user.expanded').forEach(el => el.classList.remove('expanded'));
+            document.querySelectorAll('.message.expanded-child').forEach(el => el.classList.remove('expanded-child'));
+        }
+
+        function toggleUserMessageExpansion(userMsgEl) {
+            if (!userOnlyMode) return;
+
+            const wasExpanded = userMsgEl.classList.contains('expanded');
+
+            // Collapse all first
+            collapseAllUserMessages();
+
+            if (wasExpanded) {
+                // Just collapse, don't re-expand
+                return;
+            }
+
+            // Expand this user message and show all following messages until next user message
+            userMsgEl.classList.add('expanded');
+
+            let nextEl = userMsgEl.nextElementSibling;
+            while (nextEl && !nextEl.classList.contains('user')) {
+                nextEl.classList.add('expanded-child');
+                nextEl = nextEl.nextElementSibling;
+            }
         }
 
         let projects = [];
@@ -891,7 +1001,7 @@
                     const d = new Date(s.modified * 1000);
                     const dateStr = d.toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
                     const timeStr = d.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'});
-                    const displayName = s.summary || s.name.replace('.jsonl', '').slice(0, 20);
+                    const displayName = s.summary || s.firstUserMessage || s.name.replace('.jsonl', '').slice(0, 20);
 
                     html += `
                         <div class="session-item" onclick="loadConversation('${s.path}')">
@@ -1071,7 +1181,15 @@
                 Array.isArray(msg.message?.content) &&
                 msg.message.content.some(c => c.type === 'tool_result');
 
-            const role = isToolResult ? 'tool' : (msg.type === 'user' ? 'user' : (msg.type === 'assistant' ? 'assistant' : 'system'));
+            // Check if this is a meta message (isMeta: true indicates system-injected, not real user)
+            const isMeta = msg.isMeta === true;
+
+            // Check if this is a continuation message from context overflow (fallback text check)
+            const isContinuation = msg.type === 'user' &&
+                typeof msg.message?.content === 'string' &&
+                msg.message.content.startsWith('This session is being continued from a previous conversation');
+
+            const role = isToolResult ? 'tool' : ((isMeta || isContinuation) ? 'system' : (msg.type === 'user' ? 'user' : (msg.type === 'assistant' ? 'assistant' : 'system')));
 
             let content = '';
 
@@ -1430,6 +1548,10 @@
         messagesContainer.addEventListener('click', (e) => {
             const msgEl = e.target.closest('.message[data-uuid]');
             if (msgEl && msgEl.dataset.uuid) {
+                // If in user-only mode and clicking a user message, toggle expansion
+                if (userOnlyMode && msgEl.classList.contains('user')) {
+                    toggleUserMessageExpansion(msgEl);
+                }
                 // Remove previous selection
                 document.querySelectorAll('.message.selected').forEach(el => el.classList.remove('selected'));
                 // Select this message
