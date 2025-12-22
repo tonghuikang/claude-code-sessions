@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code Conversations</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #161b22;
+            border-right: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .sidebar-header h1 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f0f6fc;
+            margin-bottom: 12px;
+        }
+
+        .list-container {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .list-header {
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #8b949e;
+            background: #161b22;
+            position: sticky;
+            top: 0;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .project-item, .session-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .project-item:hover, .session-item:hover {
+            background: #21262d;
+        }
+
+        .project-item.active, .session-item.active {
+            background: #1f6feb22;
+            border-left: 2px solid #58a6ff;
+            padding-left: 14px;
+        }
+
+        .project-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #f0f6fc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .session-name {
+            font-size: 13px;
+            color: #c9d1d9;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .session-meta {
+            font-size: 11px;
+            color: #6e7681;
+            margin-top: 2px;
+        }
+
+        /* Agent sessions nested under parent */
+        .session-item.agent-session {
+            padding-left: 32px;
+            background: #1c2128;
+            border-left: 2px solid #a371f7;
+        }
+
+        .session-item.agent-session:hover {
+            background: #262c36;
+        }
+
+        .session-item.agent-session .session-name::before {
+            content: "↳ ";
+            color: #a371f7;
+        }
+
+        .agent-badge {
+            background: #a371f7;
+            color: #fff;
+            font-size: 9px;
+            padding: 1px 4px;
+            border-radius: 3px;
+            margin-left: 6px;
+        }
+
+        /* Inline agent conversations - compact style */
+        .agent-inline-section {
+            margin: 0;
+            background: transparent;
+            border-left: 2px solid #a371f7;
+            padding-left: 6px;
+            line-height: 1.2;
+        }
+
+        .agent-inline-header {
+            padding: 8px 6px;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .agent-inline-header:hover {
+            background: #21262d;
+        }
+
+        .agent-inline-header .agent-icon {
+            color: #a371f7;
+            font-size: 10px;
+        }
+
+        .agent-inline-header .agent-title {
+            flex: 1;
+            font-size: 11px;
+            color: #a371f7;
+        }
+
+        .agent-inline-header .agent-toggle {
+            color: #6e7681;
+            font-size: 10px;
+        }
+
+        .agent-inline-content {
+            display: block;
+            padding: 4px 8px;
+            background: #0d1117;
+            white-space: normal;
+        }
+
+        .agent-inline-content.collapsed {
+            display: none;
+        }
+
+        /* Agent messages: scale down slightly from outer style */
+        .agent-inline-content .message {
+            margin-bottom: 4px;
+        }
+
+        .agent-inline-content .message-content {
+            font-size: 11px;
+            padding: 3px 6px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .agent-inline-content .message-role {
+            font-size: 9px;
+        }
+
+        .agent-inline-content .message-time {
+            font-size: 10px;
+        }
+
+        .agent-inline-content .tool-header {
+            font-size: 10px;
+        }
+
+        .agent-inline-content .tool-input,
+        .agent-inline-content .tool-result-content {
+            font-size: 11px;
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        .count-badge {
+            background: #30363d;
+            color: #8b949e;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .back-btn {
+            padding: 10px 16px;
+            background: #21262d;
+            cursor: pointer;
+            font-size: 13px;
+            color: #58a6ff;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .back-btn:hover {
+            background: #30363d;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #0d1117;
+        }
+
+        .conversation-header {
+            padding: 16px 24px;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .conversation-header h2 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f0f6fc;
+            margin: 0;
+        }
+
+        .conversation-header .meta {
+            font-size: 12px;
+            color: #6e7681;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 12px;
+        }
+
+        .message {
+            margin-bottom: 6px;
+            max-width: 100%;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 2px;
+        }
+
+        .message-role {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+
+        .message-role.user {
+            background: #1f6feb;
+            color: #fff;
+        }
+
+        .message-role.assistant {
+            background: #238636;
+            color: #fff;
+        }
+
+        .message-role.system {
+            background: #30363d;
+            color: #8b949e;
+        }
+
+        .message-role.tool {
+            background: #a371f7;
+            color: #fff;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #6e7681;
+        }
+
+        .message-content {
+            background: #161b22;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            line-height: 1.35;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border: 1px solid #30363d;
+        }
+
+        .message.user .message-content {
+            border-left: 3px solid #1f6feb;
+        }
+
+        .message.assistant .message-content {
+            border-left: 3px solid #238636;
+        }
+
+        .message.selected > .message-content {
+            outline: 2px solid #58a6ff;
+            outline-offset: -2px;
+        }
+
+        .hook-output {
+            margin-top: 8px;
+            padding: 8px;
+            background: #1c2128;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: pre-wrap;
+            border-left: 2px solid #f0883e;
+        }
+
+        /* When message content only has tool boxes, reduce padding */
+        .message-content.tools-only {
+            padding: 2px 4px;
+            background: transparent;
+            border: none;
+            border-left: 3px solid #238636;
+        }
+
+        .tool-use {
+            margin: 2px 0;
+            background: #21262d;
+            border-radius: 3px;
+            border: 1px solid #30363d;
+            overflow: hidden;
+        }
+
+        .tool-header {
+            padding: 2px 6px;
+            background: #30363d;
+            font-size: 11px;
+            font-weight: 500;
+            color: #a371f7;
+        }
+
+        .tool-input {
+            padding: 4px 6px;
+            font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            max-height: 200px;
+            overflow-y: auto;
+            color: #c9d1d9;
+            background: #0d1117;
+        }
+
+        .tool-param-label {
+            color: #8b949e;
+            font-weight: 500;
+        }
+
+        .tool-command {
+            color: #79c0ff;
+            background: #161b22;
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+
+        .tool-description {
+            color: #8b949e;
+            font-style: italic;
+            font-size: 11px;
+        }
+
+        .tool-code-preview {
+            background: #161b22;
+            padding: 4px 6px;
+            border-radius: 3px;
+            margin: 4px 0;
+            max-height: 100px;
+            overflow: auto;
+            white-space: pre-wrap;
+            font-size: 11px;
+            border-left: 2px solid #30363d;
+        }
+
+        .tool-code-preview.tool-old {
+            border-left-color: #f85149;
+            background: #2d1515;
+        }
+
+        .tool-code-preview.tool-new {
+            border-left-color: #3fb950;
+            background: #1b2e1b;
+        }
+
+        .tool-json {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .todo-completed {
+            color: #3fb950;
+        }
+
+        .todo-in_progress {
+            color: #f0883e;
+        }
+
+        .todo-pending {
+            color: #8b949e;
+        }
+
+        .tool-url {
+            color: #58a6ff;
+            word-break: break-all;
+        }
+
+        .tool-result {
+            margin: 3px 0;
+            background: #21262d;
+            border-radius: 3px;
+            border: 1px solid #30363d;
+            overflow: hidden;
+        }
+
+        .tool-result-header {
+            padding: 2px 6px;
+            background: #21262d;
+            font-size: 10px;
+            font-weight: 500;
+            color: #238636;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .tool-result.error {
+            border-color: #f85149;
+        }
+
+        .tool-result.error .tool-result-header {
+            color: #f85149;
+            background: #3d1f1f;
+        }
+
+        .tool-result.error .tool-result-content {
+            background: #2d1515;
+        }
+
+        .tool-result-content {
+            padding: 4px 6px;
+            font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre;
+            color: #c9d1d9;
+            background: #161b22;
+        }
+
+        /* Don't truncate tool results that contain images */
+        .tool-result-content:has(.message-image) {
+            max-height: none;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6e7681;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #484f58;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6e7681;
+        }
+
+        /* Image styling */
+        .message-image {
+            max-width: 100%;
+            border-radius: 4px;
+            margin: 4px 0;
+            border: 1px solid #30363d;
+            cursor: pointer;
+        }
+
+        .message-image:hover {
+            border-color: #58a6ff;
+        }
+
+        .image-container {
+            margin: 4px 0;
+        }
+
+        /* Mouse-following tooltip */
+        #mouseTooltip {
+            position: fixed;
+            background: #1c2128;
+            border: 1px solid #444c56;
+            color: #c9d1d9;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            line-height: 1.5;
+            max-width: 400px;
+            z-index: 10000;
+            pointer-events: none;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            white-space: pre-wrap;
+            font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+        }
+
+        #mouseTooltip .tooltip-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        #mouseTooltip .tooltip-key {
+            color: #8b949e;
+            min-width: 80px;
+        }
+
+        #mouseTooltip .tooltip-value {
+            color: #58a6ff;
+        }
+
+        /* Hamburger menu button */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            color: #c9d1d9;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 8px;
+        }
+
+        .hamburger:hover {
+            color: #f0f6fc;
+        }
+
+        /* Sidebar overlay for mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                z-index: 1000;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.open {
+                display: block;
+            }
+
+            .main-content {
+                width: 100%;
+            }
+
+            .conversation-header {
+                padding: 12px 16px;
+            }
+
+            .conversation-header h2 {
+                font-size: 14px;
+            }
+
+            .messages-container {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="mouseTooltip"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>Claude Code Conversations</h1>
+            </div>
+            <div class="list-container" id="listContainer">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="conversation-header" id="conversationHeader">
+                <button class="hamburger" onclick="toggleSidebar()">☰</button>
+                <div>
+                    <h2 id="conversationTitle">Select a conversation</h2>
+                    <div class="meta" id="conversationMeta"></div>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <div class="empty-state">
+                    <p>Select a conversation from the menu</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('open');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
+        }
+
+        let projects = [];
+        let currentProject = null;
+        let conversations = {};
+        let currentConversation = null;
+        let currentMessage = null;
+
+        const listContainer = document.getElementById('listContainer');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const conversationHeader = document.getElementById('conversationHeader');
+
+        // URL state management - use short project names in URLs
+        function getShortProjectName(fullName) {
+            const match = fullName.match(/-Desktop-(.+)$/);
+            return match ? match[1] : fullName.split('-').pop();
+        }
+
+        function getFullProjectName(shortName) {
+            // Find project by short name
+            const project = projects.find(p => getShortProjectName(p.name) === shortName);
+            return project ? project.name : shortName;
+        }
+
+        function updateUrl() {
+            const params = new URLSearchParams();
+            if (currentProject) params.set('project', getShortProjectName(currentProject));
+            if (currentConversation) params.set('session', currentConversation);
+            if (currentMessage) params.set('msg', currentMessage);
+            const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
+            history.pushState({project: currentProject, session: currentConversation, message: currentMessage}, '', newUrl);
+        }
+
+        function loadFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const project = params.get('project');
+            const session = params.get('session');
+            const message = params.get('msg');
+            return { project, session, message };
+        }
+
+        window.addEventListener('popstate', async (e) => {
+            const state = e.state || loadFromUrl();
+            if (state.session) {
+                const fullProject = state.project.startsWith('-Users') ? state.project : getFullProjectName(state.project);
+                currentProject = fullProject;
+                currentConversation = state.session;
+                currentMessage = state.message || null;
+                await loadProjectSessions(fullProject, false);
+                const filePath = `data/projects/${fullProject}/${state.session}.jsonl`;
+                await loadConversation(filePath, false);
+                if (currentMessage) {
+                    scrollToMessage(currentMessage);
+                }
+            } else if (state.project) {
+                const fullProject = state.project.startsWith('-Users') ? state.project : getFullProjectName(state.project);
+                currentProject = fullProject;
+                currentConversation = null;
+                currentMessage = null;
+                await loadProjectSessions(fullProject, false);
+            } else {
+                currentProject = null;
+                currentConversation = null;
+                currentMessage = null;
+                renderProjectsList();
+            }
+        });
+
+        // Initialize from URL or load projects
+        (async () => {
+            const { project, session, message } = loadFromUrl();
+            await loadProjectsData();
+            if (project) {
+                const fullProject = project.startsWith('-Users') ? project : getFullProjectName(project);
+                if (session) {
+                    currentProject = fullProject;
+                    currentMessage = message || null;
+                    await loadProjectSessions(fullProject, false);
+                    const filePath = `data/projects/${fullProject}/${session}.jsonl`;
+                    await loadConversation(filePath, false);
+                    // Small delay to ensure DOM is fully rendered
+                    if (currentMessage) {
+                        setTimeout(() => scrollToMessage(currentMessage), 100);
+                    }
+                } else {
+                    await loadProjectSessions(fullProject, false);
+                }
+            } else {
+                renderProjectsList();
+            }
+        })();
+
+        let indexData = null;  // Cache for static index
+
+        async function loadProjectsData() {
+            try {
+                // Try static index first (for GitHub Pages), fall back to API
+                let response = await fetch('data/index.json');
+                if (response.ok) {
+                    indexData = await response.json();
+                    projects = indexData.projects.map(p => ({
+                        name: p.name,
+                        path: p.path,
+                        sessionCount: p.sessionCount
+                    }));
+                } else {
+                    // Fall back to server API
+                    response = await fetch('/api/projects');
+                    projects = await response.json();
+                }
+            } catch (e) {
+                projects = [];
+            }
+        }
+
+        async function loadProjectSessions(project, pushState = true) {
+            currentProject = project;
+            currentConversation = null;
+            listContainer.innerHTML = '<div class="loading">Loading...</div>';
+            try {
+                let sessions;
+                // Try to get sessions from cached index (static mode)
+                if (indexData) {
+                    const projectData = indexData.projects.find(p => p.name === project);
+                    sessions = projectData ? projectData.sessions : [];
+                } else {
+                    // Fall back to server API
+                    const response = await fetch(`/api/sessions?project=${encodeURIComponent(project)}`);
+                    sessions = await response.json();
+                }
+                renderSessionsList(sessions);
+                if (pushState) updateUrl();
+            } catch (e) {
+                listContainer.innerHTML = '<div class="empty-state"><p>Failed to load</p></div>';
+            }
+        }
+
+        function goBackToProjects() {
+            currentProject = null;
+            currentConversation = null;
+            renderProjectsList();
+            updateUrl();
+        }
+
+        function renderProjectsList(filter = '') {
+            const filtered = projects.filter(p =>
+                p.name.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = '<div class="empty-state"><p>No projects</p></div>';
+                return;
+            }
+
+            let html = `<div class="list-header">Projects (${filtered.length})</div>`;
+            html += filtered.map(p => {
+                // Format: -Users-htong-Desktop-projectname
+                // Extract just the last folder name after Desktop (or last segment)
+                const match = p.name.match(/-Desktop-(.+)$/);
+                const projectName = match ? match[1].replace(/-/g, '-') : p.name.split('-').pop();
+                return `
+                    <div class="project-item" onclick="loadProjectSessions('${p.name}')">
+                        <div class="project-name">
+                            ${projectName}
+                            <span class="count-badge">${p.sessionCount}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            listContainer.innerHTML = html;
+        }
+
+        // Store agent sessions globally for inline display
+        let agentsByParentSession = {};
+
+        function renderSessionsList(sessions) {
+            // Separate main sessions from agent sessions
+            const mainSessions = sessions.filter(s => !s.agentId);
+            const agentSessions = sessions.filter(s => s.agentId);
+
+            // Build a map of parent session ID -> agent sessions (store globally)
+            agentsByParentSession = {};
+            agentSessions.forEach(s => {
+                const parentId = s.parentSessionId;
+                if (!agentsByParentSession[parentId]) {
+                    agentsByParentSession[parentId] = [];
+                }
+                agentsByParentSession[parentId].push(s);
+            });
+
+            // Count main sessions only (agents shown inline, not in sidebar)
+            const mainCount = mainSessions.length;
+
+            let html = `
+                <div class="back-btn" onclick="goBackToProjects()">Back</div>
+                <div class="list-header">Sessions (${mainCount})</div>
+            `;
+
+            if (mainSessions.length === 0) {
+                html += '<div class="empty-state"><p>No sessions</p></div>';
+            } else {
+                // Render only main sessions (agents shown inline in conversation)
+                mainSessions.forEach(s => {
+                    const d = new Date(s.modified * 1000);
+                    const dateStr = d.toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+                    const timeStr = d.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'});
+                    const displayName = s.summary || s.name.replace('.jsonl', '').slice(0, 20);
+
+                    html += `
+                        <div class="session-item" onclick="loadConversation('${s.path}')">
+                            <div class="session-name">${displayName}</div>
+                            <div class="session-meta">${dateStr}, ${timeStr}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            listContainer.innerHTML = html;
+        }
+
+        // Cache for loaded agent conversations
+        let loadedAgentConversations = {};
+        // Track tool_use_id -> tool info for matching Task results to agents
+        let toolUseMap = {};
+        // Track which agents have been rendered (to avoid duplicates)
+        let renderedAgents = new Set();
+
+        async function loadConversation(filePath, pushState = true) {
+            closeSidebar(); // Close sidebar on mobile when loading conversation
+            messagesContainer.innerHTML = '<div class="loading">Loading...</div>';
+            try {
+                let content;
+                // Try direct file fetch first (static mode), fall back to API
+                if (indexData) {
+                    const response = await fetch(filePath);
+                    content = await response.text();
+                } else {
+                    const response = await fetch(`/api/conversation?file=${encodeURIComponent(filePath)}`);
+                    content = await response.text();
+                }
+                parseConversation(filePath, content);
+
+                // Load related agent sessions
+                const sessionId = filePath.split('/').pop().replace('.jsonl', '');
+                const relatedAgents = agentsByParentSession[sessionId] || [];
+                loadedAgentConversations = {};
+                toolUseMap = {};
+                renderedAgents = new Set();
+
+                for (const agent of relatedAgents) {
+                    try {
+                        let agentContent;
+                        if (indexData) {
+                            const resp = await fetch(agent.path);
+                            agentContent = await resp.text();
+                        } else {
+                            const resp = await fetch(`/api/conversation?file=${encodeURIComponent(agent.path)}`);
+                            agentContent = await resp.text();
+                        }
+                        loadedAgentConversations[agent.agentId] = parseAgentConversation(agent.path, agentContent);
+                    } catch (e) {
+                        console.error('Failed to load agent:', agent.agentId, e);
+                    }
+                }
+
+                renderConversation();
+                if (pushState) updateUrl();
+            } catch (e) {
+                messagesContainer.innerHTML = '<div class="empty-state"><p>Failed to load</p></div>';
+            }
+        }
+
+        function parseAgentConversation(filename, content) {
+            const lines = content.trim().split('\n');
+            const messages = [];
+            let summary = '';
+            let agentId = '';
+
+            lines.forEach(line => {
+                try {
+                    const obj = JSON.parse(line);
+                    if (obj.type === 'summary') {
+                        summary = obj.summary;
+                    } else if (obj.type === 'user' || obj.type === 'assistant') {
+                        if (!agentId && obj.agentId) agentId = obj.agentId;
+                        // Skip "Warmup" messages
+                        if (obj.type === 'user' && obj.message?.content === 'Warmup') {
+                            return;
+                        }
+                        messages.push(obj);
+                    }
+                } catch (e) {}
+            });
+
+            return { filename, summary, agentId, messages };
+        }
+
+        function parseConversation(filename, content) {
+            const lines = content.trim().split('\n');
+            const messages = [];
+            let summary = '';
+            let sessionId = '';
+            let gitBranch = '';
+            let agentId = '';
+            let isAgent = filename.includes('agent-');
+
+            lines.forEach(line => {
+                try {
+                    const obj = JSON.parse(line);
+                    if (obj.type === 'summary') {
+                        summary = obj.summary;
+                    } else if (obj.type === 'user' || obj.type === 'assistant') {
+                        if (!sessionId && obj.sessionId) sessionId = obj.sessionId;
+                        if (!gitBranch && obj.gitBranch) gitBranch = obj.gitBranch;
+                        if (!agentId && obj.agentId) agentId = obj.agentId;
+
+                        // Skip internal "Warmup" messages in agent sessions
+                        if (isAgent && obj.type === 'user' && obj.message?.content === 'Warmup') {
+                            return;
+                        }
+                        messages.push(obj);
+                    } else if (obj.type === 'system') {
+                        messages.push(obj);
+                    }
+                } catch (e) {}
+            });
+
+            const id = filename.split('/').pop().replace('.jsonl', '');
+            currentConversation = id;
+            conversations[id] = { filename, summary, sessionId, gitBranch, agentId, isAgent, messages };
+        }
+
+        function renderConversation() {
+            const conv = conversations[currentConversation];
+            if (!conv) return;
+
+            // Use summary, or first user message, or filename as title
+            let title = conv.summary;
+            if (!title) {
+                const firstUserMsg = conv.messages.find(m => m.type === 'user' && m.message?.content);
+                if (firstUserMsg) {
+                    const content = typeof firstUserMsg.message.content === 'string'
+                        ? firstUserMsg.message.content
+                        : firstUserMsg.message.content.find(c => c.type === 'text')?.text || '';
+                    title = content.slice(0, 100) + (content.length > 100 ? '...' : '');
+                }
+            }
+            document.getElementById('conversationTitle').textContent = title || conv.filename.split('/').pop();
+            document.getElementById('conversationMeta').textContent = conv.gitBranch ? `Branch: ${conv.gitBranch}` : '';
+
+            renderMessages();
+        }
+
+        function renderAgentInline(agentId, agentConv, msgUuid) {
+            const title = agentConv.summary || `Agent ${agentId}`;
+            const msgCount = agentConv.messages.length;
+
+            // Reuse the same renderMessage function for consistency
+            const messagesHtml = agentConv.messages.map(msg => renderMessage(msg, true)).join('');
+
+            return `<div class="agent-inline-section"><div class="agent-inline-header" onclick="toggleAgentContent('${agentId}')"><span class="agent-icon">⚡</span><span class="agent-title">Agent ${agentId}</span><span class="agent-toggle">${msgCount} messages ▼</span></div><div class="agent-inline-content" id="agent-content-${agentId}">${messagesHtml}</div></div>`;
+        }
+
+        function toggleAgentContent(agentId) {
+            const content = document.getElementById('agent-content-' + agentId);
+            if (content) {
+                content.classList.toggle('collapsed');
+            }
+        }
+
+        function renderMessages() {
+            const conv = conversations[currentConversation];
+            if (!conv) return;
+
+            // Render all messages - agents are inserted inline after Task tool results
+            messagesContainer.innerHTML = conv.messages.map(msg => renderMessage(msg, true)).join('');
+        }
+
+        function renderMessage(msg, showTools) {
+            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'}) : '';
+
+            // Check if this is a tool_result message (comes as type: "user" but is really tool output)
+            const isToolResult = msg.type === 'user' &&
+                Array.isArray(msg.message?.content) &&
+                msg.message.content.some(c => c.type === 'tool_result');
+
+            const role = isToolResult ? 'tool' : (msg.type === 'user' ? 'user' : (msg.type === 'assistant' ? 'assistant' : 'system'));
+
+            let content = '';
+
+            // Handle system messages (different structure)
+            if (msg.type === 'system') {
+                const parts = [];
+                if (msg.subtype) parts.push(`[${msg.subtype}]`);
+                if (msg.hookInfos && msg.hookInfos.length > 0) {
+                    parts.push(`Hooks: ${msg.hookInfos.map(h => h.command).join(', ')}`);
+                }
+                if (msg.stopReason) parts.push(`Stop: ${msg.stopReason}`);
+                if (msg.level) parts.push(`Level: ${msg.level}`);
+                content = escapeHtml(parts.join(' | ') || 'System event');
+                // Show hook output/errors if present
+                if (msg.hookErrors && msg.hookErrors.length > 0) {
+                    content += '<div class="hook-output">' + msg.hookErrors.map(e => escapeHtml(e)).join('<hr>') + '</div>';
+                }
+            } else if (msg.message) {
+                if (typeof msg.message.content === 'string') {
+                    content = escapeHtml(msg.message.content);
+                } else if (Array.isArray(msg.message.content)) {
+                    content = msg.message.content.map(c => {
+                        if (c.type === 'text') {
+                            return escapeHtml(c.text);
+                        } else if (c.type === 'image' && c.source) {
+                            // Handle base64 images
+                            const src = c.source.type === 'base64'
+                                ? `data:${c.source.media_type};base64,${c.source.data}`
+                                : c.source.url;
+                            return `<div class="image-container"><img class="message-image" src="${src}" alt="Image"></div>`;
+                        } else if (c.type === 'tool_use' && showTools) {
+                            return renderToolUse(c);
+                        } else if (c.type === 'tool_result' && showTools) {
+                            return renderToolResult(c, msg.uuid);
+                        }
+                        return '';
+                    }).join('');
+                }
+            }
+
+            if (!content.trim()) return '';
+
+            // Build tooltip data with ALL non-id attributes
+            const tooltipData = {};
+            if (msg.message?.model) tooltipData.model = msg.message.model;
+            if (msg.agentId) tooltipData.agent = msg.agentId;
+            if (msg.gitBranch) tooltipData.branch = msg.gitBranch;
+            if (msg.version) tooltipData.version = msg.version;
+            if (msg.isSidechain !== undefined) tooltipData.sidechain = msg.isSidechain;
+            if (msg.cwd) tooltipData.cwd = msg.cwd;
+            if (msg.userType) tooltipData.userType = msg.userType;
+            if (msg.message?.stop_reason) tooltipData.stop_reason = msg.message.stop_reason;
+            if (msg.message?.usage) {
+                const u = msg.message.usage;
+                tooltipData.tokens = `in:${u.input_tokens || 0} out:${u.output_tokens || 0}`;
+                if (u.cache_read_input_tokens) tooltipData.cache_read = u.cache_read_input_tokens;
+                if (u.cache_creation_input_tokens) tooltipData.cache_create = u.cache_creation_input_tokens;
+            }
+            if (msg.parentUuid) tooltipData.parent = msg.parentUuid;
+            if (msg.requestId) tooltipData.request = msg.requestId;
+
+            const uuid = msg.uuid || '';
+            const selectedClass = currentMessage === uuid ? ' selected' : '';
+
+            // Check if content is only tool calls (no text)
+            let isToolsOnly = false;
+            if (Array.isArray(msg.message?.content)) {
+                const hasText = msg.message.content.some(c => c.type === 'text' && c.text?.trim());
+                const hasTools = msg.message.content.some(c => c.type === 'tool_use' || c.type === 'tool_result');
+                isToolsOnly = hasTools && !hasText;
+            }
+            const toolsOnlyClass = isToolsOnly ? ' tools-only' : '';
+
+            return `
+                <div class="message ${role}${selectedClass}" data-tooltip='${JSON.stringify(tooltipData)}' data-uuid="${uuid}">
+                    <div class="message-header">
+                        <span class="message-role ${role}">${role}</span>
+                        <span class="message-time">${time}</span>
+                    </div>
+                    <div class="message-content${toolsOnlyClass}">${content}</div>
+                </div>
+            `;
+        }
+
+        function renderToolUse(toolUse) {
+            const name = toolUse.name;
+            const input = toolUse.input || {};
+
+            // Standard tool rendering
+            let displayContent = '';
+
+            switch (name) {
+                case 'Read':
+                    displayContent = `<span class="tool-param-label">file:</span> ${escapeHtml(input.file_path || '')}`;
+                    if (input.offset || input.limit) {
+                        displayContent += `<br><span class="tool-param-label">range:</span> ${input.offset || 0}-${(input.offset || 0) + (input.limit || '?')}`;
+                    }
+                    break;
+
+                case 'Write':
+                    displayContent = `<span class="tool-param-label">file:</span> ${escapeHtml(input.file_path || '')}`;
+                    if (input.content) {
+                        const preview = input.content.length > 500 ? input.content.slice(0, 500) + '...' : input.content;
+                        displayContent += `<br><span class="tool-param-label">content:</span><pre class="tool-code-preview">${escapeHtml(preview)}</pre>`;
+                    }
+                    break;
+
+                case 'Edit':
+                    displayContent = `<span class="tool-param-label">file:</span> ${escapeHtml(input.file_path || '')}`;
+                    if (input.old_string) {
+                        const oldPreview = input.old_string.length > 200 ? input.old_string.slice(0, 200) + '...' : input.old_string;
+                        displayContent += `<br><span class="tool-param-label">old:</span><pre class="tool-code-preview tool-old">${escapeHtml(oldPreview)}</pre>`;
+                    }
+                    if (input.new_string) {
+                        const newPreview = input.new_string.length > 200 ? input.new_string.slice(0, 200) + '...' : input.new_string;
+                        displayContent += `<br><span class="tool-param-label">new:</span><pre class="tool-code-preview tool-new">${escapeHtml(newPreview)}</pre>`;
+                    }
+                    break;
+
+                case 'Bash':
+                    displayContent = `<span class="tool-param-label">$</span> <code class="tool-command">${escapeHtml(input.command || '')}</code>`;
+                    if (input.description) {
+                        displayContent = `<span class="tool-description">${escapeHtml(input.description)}</span><br>` + displayContent;
+                    }
+                    if (input.timeout) {
+                        displayContent += `<br><span class="tool-param-label">timeout:</span> ${input.timeout}ms`;
+                    }
+                    break;
+
+                case 'Glob':
+                    displayContent = `<span class="tool-param-label">pattern:</span> <code>${escapeHtml(input.pattern || '')}</code>`;
+                    if (input.path) {
+                        displayContent += `<br><span class="tool-param-label">path:</span> ${escapeHtml(input.path)}`;
+                    }
+                    break;
+
+                case 'Grep':
+                    displayContent = `<span class="tool-param-label">pattern:</span> <code>${escapeHtml(input.pattern || '')}</code>`;
+                    if (input.path) {
+                        displayContent += `<br><span class="tool-param-label">path:</span> ${escapeHtml(input.path)}`;
+                    }
+                    if (input.glob) {
+                        displayContent += `<br><span class="tool-param-label">glob:</span> ${escapeHtml(input.glob)}`;
+                    }
+                    break;
+
+                case 'Task':
+                    // Track this Task tool call for matching with agent results
+                    toolUseMap[toolUse.id] = { name: 'Task', input: input };
+                    displayContent = `<span class="tool-param-label">type:</span> ${escapeHtml(input.subagent_type || '')}`;
+                    if (input.description) {
+                        displayContent += `<br><span class="tool-param-label">desc:</span> ${escapeHtml(input.description)}`;
+                    }
+                    if (input.prompt) {
+                        const promptPreview = input.prompt.length > 300 ? input.prompt.slice(0, 300) + '...' : input.prompt;
+                        displayContent += `<br><span class="tool-param-label">prompt:</span><pre class="tool-code-preview">${escapeHtml(promptPreview)}</pre>`;
+                    }
+                    break;
+
+                case 'TodoWrite':
+                    if (input.todos && Array.isArray(input.todos)) {
+                        displayContent = input.todos.map(t => {
+                            const icon = t.status === 'completed' ? '✓' : t.status === 'in_progress' ? '→' : '○';
+                            return `<span class="todo-${t.status}">${icon} ${escapeHtml(t.content)}</span>`;
+                        }).join('<br>');
+                    }
+                    break;
+
+                case 'WebFetch':
+                    displayContent = `<span class="tool-param-label">url:</span> <a href="${escapeHtml(input.url || '')}" target="_blank">${escapeHtml(input.url || '')}</a>`;
+                    if (input.prompt) {
+                        displayContent += `<br><span class="tool-param-label">prompt:</span> ${escapeHtml(input.prompt)}`;
+                    }
+                    break;
+
+                case 'WebSearch':
+                    displayContent = `<span class="tool-param-label">query:</span> "${escapeHtml(input.query || '')}"`;
+                    break;
+
+                case 'AskUserQuestion':
+                    if (input.questions && Array.isArray(input.questions)) {
+                        displayContent = input.questions.map(q => `<span class="tool-param-label">Q:</span> ${escapeHtml(q.question)}`).join('<br>');
+                    }
+                    break;
+
+                case 'NotebookEdit':
+                    displayContent = `<span class="tool-param-label">notebook:</span> ${escapeHtml(input.notebook_path || '')}`;
+                    if (input.cell_type) {
+                        displayContent += `<br><span class="tool-param-label">cell type:</span> ${escapeHtml(input.cell_type)}`;
+                    }
+                    if (input.edit_mode) {
+                        displayContent += `<br><span class="tool-param-label">mode:</span> ${escapeHtml(input.edit_mode)}`;
+                    }
+                    break;
+
+                // MCP Puppeteer tools
+                case 'mcp__puppeteer__puppeteer_navigate':
+                    displayContent = `<span class="tool-param-label">url:</span> <a href="${escapeHtml(input.url || '')}" target="_blank" class="tool-url">${escapeHtml(input.url || '')}</a>`;
+                    break;
+
+                case 'mcp__puppeteer__puppeteer_screenshot':
+                    displayContent = `<span class="tool-param-label">name:</span> ${escapeHtml(input.name || '')}`;
+                    if (input.width || input.height) {
+                        displayContent += `<br><span class="tool-param-label">size:</span> ${input.width || '?'}x${input.height || '?'}`;
+                    }
+                    if (input.selector) {
+                        displayContent += `<br><span class="tool-param-label">selector:</span> <code>${escapeHtml(input.selector)}</code>`;
+                    }
+                    break;
+
+                case 'mcp__puppeteer__puppeteer_click':
+                case 'mcp__puppeteer__puppeteer_hover':
+                    displayContent = `<span class="tool-param-label">selector:</span> <code>${escapeHtml(input.selector || '')}</code>`;
+                    break;
+
+                case 'mcp__puppeteer__puppeteer_fill':
+                    displayContent = `<span class="tool-param-label">selector:</span> <code>${escapeHtml(input.selector || '')}</code>`;
+                    displayContent += `<br><span class="tool-param-label">value:</span> "${escapeHtml(input.value || '')}"`;
+                    break;
+
+                case 'mcp__puppeteer__puppeteer_select':
+                    displayContent = `<span class="tool-param-label">selector:</span> <code>${escapeHtml(input.selector || '')}</code>`;
+                    displayContent += `<br><span class="tool-param-label">value:</span> "${escapeHtml(input.value || '')}"`;
+                    break;
+
+                case 'mcp__puppeteer__puppeteer_evaluate':
+                    const scriptPreview = (input.script || '').length > 300 ? input.script.slice(0, 300) + '...' : input.script;
+                    displayContent = `<span class="tool-param-label">script:</span><pre class="tool-code-preview">${escapeHtml(scriptPreview || '')}</pre>`;
+                    break;
+
+                default:
+                    // For unknown tools or MCP tools, show JSON
+                    const jsonStr = typeof input === 'object' ? JSON.stringify(input, null, 2) : input;
+                    displayContent = `<pre class="tool-json">${escapeHtml(jsonStr)}</pre>`;
+            }
+
+            return `<div class="tool-use"><div class="tool-header">${escapeHtml(name)}</div><div class="tool-input">${displayContent}</div></div>`;
+        }
+
+        function renderToolResult(toolResult, msgUuid) {
+            let content = '';
+            let rawContent = '';
+
+            if (typeof toolResult.content === 'string') {
+                content = escapeHtml(toolResult.content);
+                rawContent = toolResult.content;
+            } else if (Array.isArray(toolResult.content)) {
+                content = toolResult.content.map(c => {
+                    if (c.type === 'image' && c.source) {
+                        const src = c.source.type === 'base64'
+                            ? `data:${c.source.media_type};base64,${c.source.data}`
+                            : c.source.url;
+                        return `<div class="image-container"><img class="message-image" src="${src}" alt="Image"></div>`;
+                    }
+                    if (c.text) rawContent += c.text;
+                    return c.text ? escapeHtml(c.text) : '';
+                }).join('\n');
+            }
+
+            const isError = toolResult.is_error === true;
+            const errorClass = isError ? ' error' : '';
+            const headerText = isError ? 'Hook Error' : 'Output';
+
+            let resultHtml = `<div class="tool-result${errorClass}"><div class="tool-result-header">${headerText}</div><div class="tool-result-content">${content}</div></div>`;
+
+            // Check if this is a Task tool result - if so, insert agent inline
+            const toolUseId = toolResult.tool_use_id;
+            const toolInfo = toolUseMap[toolUseId];
+            if (toolInfo && toolInfo.name === 'Task') {
+                // Try to find matching agent by looking for agent ID in the result
+                // Task results often contain "Agent ID: xxx" or similar
+                const agentIdMatch = rawContent.match(/agent[_-]?(?:id)?[:\s]*([a-f0-9]{8})/i) ||
+                                     rawContent.match(/([a-f0-9]{8})/);
+
+                // Also try to match by finding any unrendered agent
+                let matchedAgentId = null;
+                if (agentIdMatch) {
+                    const potentialId = agentIdMatch[1];
+                    if (loadedAgentConversations[potentialId] && !renderedAgents.has(potentialId)) {
+                        matchedAgentId = potentialId;
+                    }
+                }
+
+                // If no match by ID, try to get next unrendered agent in order
+                if (!matchedAgentId) {
+                    for (const agentId of Object.keys(loadedAgentConversations)) {
+                        if (!renderedAgents.has(agentId)) {
+                            matchedAgentId = agentId;
+                            break;
+                        }
+                    }
+                }
+
+                if (matchedAgentId && loadedAgentConversations[matchedAgentId]) {
+                    renderedAgents.add(matchedAgentId);
+                    resultHtml += renderAgentInline(matchedAgentId, loadedAgentConversations[matchedAgentId], msgUuid);
+                }
+            }
+
+            return resultHtml;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Mouse-following tooltip
+        const mouseTooltip = document.getElementById('mouseTooltip');
+
+        document.addEventListener('mousemove', (e) => {
+            const msgEl = e.target.closest('.message[data-tooltip]');
+            if (msgEl) {
+                const data = JSON.parse(msgEl.dataset.tooltip);
+                if (Object.keys(data).length > 0) {
+                    // Build tooltip content
+                    let html = '';
+                    for (const [key, value] of Object.entries(data)) {
+                        html += `<div class="tooltip-row"><span class="tooltip-key">${key}:</span><span class="tooltip-value">${value}</span></div>`;
+                    }
+                    mouseTooltip.innerHTML = html;
+                    mouseTooltip.style.display = 'block';
+
+                    // Position near cursor
+                    let x = e.clientX + 15;
+                    let y = e.clientY + 15;
+
+                    // Keep tooltip on screen
+                    const rect = mouseTooltip.getBoundingClientRect();
+                    if (x + rect.width > window.innerWidth) {
+                        x = e.clientX - rect.width - 10;
+                    }
+                    if (y + rect.height > window.innerHeight) {
+                        y = e.clientY - rect.height - 10;
+                    }
+
+                    mouseTooltip.style.left = x + 'px';
+                    mouseTooltip.style.top = y + 'px';
+                } else {
+                    mouseTooltip.style.display = 'none';
+                }
+            } else {
+                mouseTooltip.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if (!e.relatedTarget || !document.body.contains(e.relatedTarget)) {
+                mouseTooltip.style.display = 'none';
+            }
+        });
+
+        // Click on message to select it and update URL
+        messagesContainer.addEventListener('click', (e) => {
+            const msgEl = e.target.closest('.message[data-uuid]');
+            if (msgEl && msgEl.dataset.uuid) {
+                // Remove previous selection
+                document.querySelectorAll('.message.selected').forEach(el => el.classList.remove('selected'));
+                // Select this message
+                msgEl.classList.add('selected');
+                currentMessage = msgEl.dataset.uuid;
+                updateUrl();
+            }
+        });
+
+        function scrollToMessage(uuid) {
+            // Find the message (agent sections are expanded by default now)
+            const msgEl = document.querySelector(`.message[data-uuid="${uuid}"]`);
+            if (msgEl) {
+                // Make sure parent agent section is not collapsed
+                const parentAgentContent = msgEl.closest('.agent-inline-content');
+                if (parentAgentContent) {
+                    parentAgentContent.classList.remove('collapsed');
+                }
+
+                msgEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                msgEl.classList.add('selected');
+            }
+        }
+    </script>
+</body>
+</html>

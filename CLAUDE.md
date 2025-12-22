@@ -1,4 +1,12 @@
-For changes involving html files, please use MCP pupeeteer to test.
+For changes involving html files, please use MCP puppeteer to test.
+
+Testing HTML changes
+- ONLY use `./run_server.sh` - it handles everything (kills existing servers, starts new one)
+- NEVER run `uv run python server.py` directly or any other server command - ONLY `./run_server.sh`
+- NEVER use background execution (&) or nohup for starting servers
+- NEVER run `lsof`, `kill`, or any port management commands - `./run_server.sh` handles this
+- If server fails to start, just run `./run_server.sh` again - do NOT try to debug with other commands
+- Test at http://localhost:44043/
 
 Package Management
 - ONLY use uv, NEVER pip
@@ -13,3 +21,6 @@ Formatting
 - Fix: uv run --frozen ruff check *.py --fix
 - Sort imports: uv run --frozen ruff check --select I *.py --fix
 - Type checking: uv run --frozen mypy *.py
+
+Approved Commands
+- ./run_server.sh
