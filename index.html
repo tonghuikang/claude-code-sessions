@@ -882,7 +882,15 @@
                     await loadProjectSessions(fullProject, false);
                 }
             } else {
-                renderProjectsList();
+                // Auto-load latest session from the first project
+                if (projects.length > 0) {
+                    const firstProject = projects[0];
+                    await loadProjectSessions(firstProject.name, false);
+                    // After loading sessions, auto-select the first main session
+                    await autoLoadFirstSession();
+                } else {
+                    renderProjectsList();
+                }
             }
         })();
 
@@ -967,6 +975,26 @@
             listContainer.innerHTML = html;
         }
 
+        function updateSessionHighlight() {
+            // Remove active class from all sessions
+            document.querySelectorAll('.session-item.active').forEach(el => el.classList.remove('active'));
+            // Add active class to current session
+            if (currentConversation) {
+                const activeSession = document.querySelector(`.session-item[data-session-id="${currentConversation}"]`);
+                if (activeSession) {
+                    activeSession.classList.add('active');
+                }
+            }
+        }
+
+        async function autoLoadFirstSession() {
+            // Click the first session item in the sidebar to load it
+            const firstSession = document.querySelector('.session-item');
+            if (firstSession) {
+                firstSession.click();
+            }
+        }
+
         // Store agent sessions globally for inline display
         let agentsByParentSession = {};
 
@@ -1002,9 +1030,11 @@
                     const dateStr = d.toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
                     const timeStr = d.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'});
                     const displayName = s.summary || s.firstUserMessage || s.name.replace('.jsonl', '').slice(0, 20);
+                    const sessionId = s.name.replace('.jsonl', '');
+                    const activeClass = currentConversation === sessionId ? ' active' : '';
 
                     html += `
-                        <div class="session-item" onclick="loadConversation('${s.path}')">
+                        <div class="session-item${activeClass}" data-session-id="${sessionId}" onclick="loadConversation('${s.path}')">
                             <div class="session-name">${displayName}</div>
                             <div class="session-meta">${dateStr}, ${timeStr}</div>
                         </div>
@@ -1061,6 +1091,7 @@
                 }
 
                 renderConversation();
+                updateSessionHighlight();
                 if (pushState) updateUrl();
             } catch (e) {
                 messagesContainer.innerHTML = '<div class="empty-state"><p>Failed to load</p></div>';

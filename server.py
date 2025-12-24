@@ -45,6 +45,14 @@ class ConversationHandler(http.server.SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
+    def end_headers(self):
+        # Add no-cache headers for HTML files during development
+        if self.path.endswith(".html") or self.path == "/" or self.path == "":
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
+        super().end_headers()
+
     def send_json(self, data):
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
