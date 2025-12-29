@@ -33,3 +33,20 @@ Cleanup
 Approved Commands
 - ./run_server.sh
 - ./cleanup.sh
+
+Git Unignore Session Files
+- When user provides a URL like `http://localhost:44045/index.html?project=blog&session=ee51e1b9-...`:
+    1. Extract `project` → blog, `session` → ee51e1b9-...
+    2. Add these three lines to .gitignore:
+        ```
+        !data/projects/-Users-htong-Desktop-<project>/
+        data/projects/-Users-htong-Desktop-<project>/*
+        !data/projects/-Users-htong-Desktop-<project>/<session-id>.jsonl
+        ```
+    3. Run `./sync.sh` to import session data (if files don't exist yet)
+    4. Run `./cleanup.sh` to rebuild the index and verify pattern works
+- The three lines are required because:
+    1. First unignore the directory itself
+    2. Then ignore all contents
+    3. Finally unignore the specific file
+- IMPORTANT: Edit .gitignore BEFORE running cleanup, or the file will be deleted

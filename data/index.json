@@ -1,16 +1,171 @@
 {
   "projects": [
     {
+      "name": "-Users-htong-Desktop-blog",
+      "path": "data/projects/-Users-htong-Desktop-blog",
+      "sessionCount": 1,
+      "sessions": [
+        {
+          "name": "ee51e1b9-9c74-4c63-bd3e-79ce634884c0.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-blog/ee51e1b9-9c74-4c63-bd3e-79ce634884c0.jsonl",
+          "summary": "Jekyll blog post cleanup and local serve",
+          "firstUserMessage": "comment on _posts/2025-12-28-vllm-logs.md",
+          "modified": 1766987876.0
+        }
+      ]
+    },
+    {
       "name": "-Users-htong-Desktop-claude-code-sessions",
       "path": "data/projects/-Users-htong-Desktop-claude-code-sessions",
-      "sessionCount": 15,
+      "sessionCount": 32,
       "sessions": [
+        {
+          "name": "94a00534-f723-4d8d-ad58-4f1f717d7ef6.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/94a00534-f723-4d8d-ad58-4f1f717d7ef6.jsonl",
+          "summary": "",
+          "firstUserMessage": "git unignore related to http://localhost:44045/index.html?project=blog&session=ee51e1b9-9c74-4c63-bd",
+          "modified": 1766988189.0
+        },
+        {
+          "name": "agent-adff277.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/agent-adff277.jsonl",
+          "summary": "",
+          "firstUserMessage": "",
+          "modified": 1766988187.0,
+          "agentId": "adff277",
+          "parentSessionId": "94a00534-f723-4d8d-ad58-4f1f717d7ef6"
+        },
+        {
+          "name": "agent-a3ba710.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/agent-a3ba710.jsonl",
+          "summary": "",
+          "firstUserMessage": "",
+          "modified": 1766988011.0,
+          "agentId": "a3ba710",
+          "parentSessionId": "94a00534-f723-4d8d-ad58-4f1f717d7ef6"
+        },
+        {
+          "name": "agent-af67761.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/agent-af67761.jsonl",
+          "summary": "",
+          "firstUserMessage": "",
+          "modified": 1766987981.0,
+          "agentId": "af67761",
+          "parentSessionId": "d3d45964-f294-4fbc-a384-191a2dd5ab67"
+        },
+        {
+          "name": "agent-a66e0d3.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/agent-a66e0d3.jsonl",
+          "summary": "",
+          "firstUserMessage": "",
+          "modified": 1766987965.0,
+          "agentId": "a66e0d3",
+          "parentSessionId": "d3d45964-f294-4fbc-a384-191a2dd5ab67"
+        },
+        {
+          "name": "d3d45964-f294-4fbc-a384-191a2dd5ab67.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/d3d45964-f294-4fbc-a384-191a2dd5ab67.jsonl",
+          "summary": "Fix Session URL Auto-Scroll to Subagent",
+          "firstUserMessage": "",
+          "modified": 1766987963.0
+        },
+        {
+          "name": "dfb4ac5a-99d7-4ac6-a201-ccf1c963b86c.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/dfb4ac5a-99d7-4ac6-a201-ccf1c963b86c.jsonl",
+          "summary": "",
+          "firstUserMessage": "https://sessions.huikang.dev/?project=claude-code-tracing&session=10d53ddc-6406-4bed-a32b-da56257311",
+          "modified": 1766548551.0
+        },
+        {
+          "name": "agent-681bea26.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/agent-681bea26.jsonl",
+          "summary": "",
+          "firstUserMessage": "",
+          "modified": 1766548482.0,
+          "agentId": "681bea26",
+          "parentSessionId": "dfb4ac5a-99d7-4ac6-a201-ccf1c963b86c"
+        },
+        {
+          "name": "agent-445fb16b.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/agent-445fb16b.jsonl",
+          "summary": "",
+          "firstUserMessage": "",
+          "modified": 1766548477.0,
+          "agentId": "445fb16b",
+          "parentSessionId": "dfb4ac5a-99d7-4ac6-a201-ccf1c963b86c"
+        },
+        {
+          "name": "6a3d459e-03c7-4e5f-825c-b030e392e067.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/6a3d459e-03c7-4e5f-825c-b030e392e067.jsonl",
+          "summary": "CLI tool development setup and configuration",
+          "firstUserMessage": "when visiting the root page it should show the latest sessions",
+          "modified": 1766547540.0
+        },
+        {
+          "name": "agent-f92caa38.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/agent-f92caa38.jsonl",
+          "summary": "",
+          "firstUserMessage": "Explore this codebase to understand its structure. I need to know:\n1. What kind of web application t",
+          "modified": 1766545704.0,
+          "agentId": "f92caa38",
+          "parentSessionId": "6a3d459e-03c7-4e5f-825c-b030e392e067"
+        },
+        {
+          "name": "agent-26de6efc.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/agent-26de6efc.jsonl",
+          "summary": "",
+          "firstUserMessage": "",
+          "modified": 1766545620.0,
+          "agentId": "26de6efc",
+          "parentSessionId": "6a3d459e-03c7-4e5f-825c-b030e392e067"
+        },
+        {
+          "name": "agent-a4773e51.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/agent-a4773e51.jsonl",
+          "summary": "",
+          "firstUserMessage": "",
+          "modified": 1766545619.0,
+          "agentId": "a4773e51",
+          "parentSessionId": "6a3d459e-03c7-4e5f-825c-b030e392e067"
+        },
+        {
+          "name": "46ebea9c-575d-473d-a724-a8a69855743b.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/46ebea9c-575d-473d-a724-a8a69855743b.jsonl",
+          "summary": "",
+          "firstUserMessage": "<command-name>/clear</command-name>\n            <command-message>clear</command-message>\n           ",
+          "modified": 1766406574.0
+        },
+        {
+          "name": "d44bee8b-4b8c-47b1-a2e7-f8dd137d7395.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/d44bee8b-4b8c-47b1-a2e7-f8dd137d7395.jsonl",
+          "summary": "",
+          "firstUserMessage": "",
+          "modified": 1766406334.0
+        },
+        {
+          "name": "agent-62b27758.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/agent-62b27758.jsonl",
+          "summary": "",
+          "firstUserMessage": "",
+          "modified": 1766406329.0,
+          "agentId": "62b27758",
+          "parentSessionId": "d44bee8b-4b8c-47b1-a2e7-f8dd137d7395"
+        },
+        {
+          "name": "agent-f47f0844.jsonl",
+          "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/agent-f47f0844.jsonl",
+          "summary": "",
+          "firstUserMessage": "",
+          "modified": 1766406327.0,
+          "agentId": "f47f0844",
+          "parentSessionId": "d44bee8b-4b8c-47b1-a2e7-f8dd137d7395"
+        },
         {
           "name": "fd293da7-7072-4a0c-a1fc-716fbe921e85.jsonl",
           "path": "data/projects/-Users-htong-Desktop-claude-code-sessions/fd293da7-7072-4a0c-a1fc-716fbe921e85.jsonl",
           "summary": "GitHub Pages deployment blocked by gitignore",
           "firstUserMessage": "there should be a button on the top right of https://tonghuikang.github.io/claude-code-sessions/?pro",
-          "modified": 1766401204.0
+          "modified": 1766402098.0
         },
         {
           "name": "agent-795ed062.jsonl",

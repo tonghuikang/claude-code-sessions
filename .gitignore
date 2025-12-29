@@ -10,3 +10,6 @@ data/*
 data/projects/*
 !data/projects/-Users-htong-Desktop-claude-code-tracing/
 !data/projects/-Users-htong-Desktop-claude-code-sessions/
+!data/projects/-Users-htong-Desktop-blog/
+data/projects/-Users-htong-Desktop-blog/*
+!data/projects/-Users-htong-Desktop-blog/ee51e1b9-9c74-4c63-bd3e-79ce634884c0.jsonl
